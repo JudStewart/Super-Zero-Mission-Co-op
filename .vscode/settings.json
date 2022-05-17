@@ -1,0 +1,9 @@
+{
+    "Lua.diagnostics.globals": [
+        "memory",
+        "comm",
+        "console",
+        "bit",
+        "event"
+    ]
+}

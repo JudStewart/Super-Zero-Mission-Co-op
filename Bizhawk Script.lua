@@ -114,15 +114,14 @@ local function checkEquippedEqualsObtained(abilityValue)
     return (eqAbility == obAbility and eqBeam == obBeam)
 end
 
+--TODO: See if post request can go in background thread
+
 local function abilityCollected()
     local newAbilities = memory.read_u32_le(0x153C)
     if abilities ~= newAbilities and checkEquippedEqualsObtained(newAbilities) then
         -- gui.text(50, 50, "Player obtained new ability") (doesn't display long enough)
         local item = (abilityMap[newAbilities - abilities] or "undefined")
-        -- console.log(comm.httpPost("http://localhost:5000/mzm/acquired", item)) -- won't send data
-        -- console.log(comm.httpGet("http://localhost:5000/mzm")) (this actually worked)
-        console.log(comm.httpGet("http://localhost:5000/mzm/" .. item))
-        comm.socketServerSend(item)
+        console.log(comm.httpPost("http://localhost:5000/mzm/acquired", item))
         console.log("Player obtained " .. item .. ". (ability value is " .. string.format("%x, and difference is %x)", newAbilities, newAbilities - abilities))
     end
     abilities = newAbilities
