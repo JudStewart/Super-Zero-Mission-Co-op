@@ -5,6 +5,11 @@ import sys
 import json
 
 ws = websocket.WebSocket()
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'my_secret_key'
+socketio = SocketIO(app, logger=True)
+
+
 
 def connect_qusb2snes():
     qusbIP = "ws://localhost:8080"
@@ -45,14 +50,6 @@ def connect_qusb2snes():
         "Space": "SNES"
     }))
     print(json.loads(ws.recv())["Results"])
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'my_secret_key'
-socketio = SocketIO(app, logger=True)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
     
 @app.route('/mzm')
 def mzm():
@@ -62,14 +59,9 @@ def mzm():
     
 @app.route('/mzm/acquired', methods= ['POST'])
 def mzm_received_item():
-    print(f"'{request.data.decode('UTF-8')}'")
-    print(f"Content-type = {request.content_type}")
-    return f"parsing for {request.data}"
-    
-@app.route('/mzm/<item>')
-def mzm_item(item):
-    print(item)
-    return f"Parsing for item {item}"
+    item = request.form['payload']
+    print(f"MZM player acquired item '{item}'")
+    return f"Parsing acquired {item}"
 
 @socketio.on('connect')
 def test_connect():
@@ -84,5 +76,5 @@ def handle_message(message):
     print("Received message " + str(message))
 
 if __name__ == "__main__":
-    connect_qusb2snes()
+    # connect_qusb2snes()
     socketio.run(app)
