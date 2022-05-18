@@ -3,6 +3,7 @@ from flask_socketio import SocketIO, emit, send
 import websocket
 import sys
 import json
+import ZeroMission
 
 ws = websocket.WebSocket()
 app = Flask(__name__)
@@ -62,6 +63,35 @@ def mzm_received_item():
     item = request.form['payload']
     print(f"MZM player acquired item '{item}'")
     return f"Parsing acquired {item}"
+    
+@app.route('/mzm/acquired/missile', methods = ['POST'])
+def mzm_missile_tank():
+    capacity = request.form['payload']
+    tanks = capacity / 5
+    print(f"MZM player acquired missile tank number {tanks}")
+    return "success"
+
+@app.route('/mzm/acquired/super', methods = ['POST'])
+def mzm_super_missile_tank():
+    capacity = request.form['payload']
+    tanks = capacity / 2
+    print(f"MZM player acquired super missile tank number {tanks}")
+    return "success"
+
+@app.route('/mzm/acquired/powerbomb', methods = ['POST'])
+def mzm_power_bomb_tank():
+    capacity = request.form['payload']
+    tanks = capacity / 2
+    print(f"MZM player acquired power bomb tank number {tanks}")
+    return "success"
+    
+@app.route('/mzm/acquired/energy', methods = ['POST'])
+def mzm_energy_tank():
+    capacity = request.form['payload']
+    tanks = ((capacity + 1) / 100) - 1
+    print(f"MZM player acquired e-tank number {tanks}")
+    ZeroMission.energy_tanks = tanks
+    return "success"
 
 @socketio.on('connect')
 def test_connect():

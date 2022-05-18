@@ -121,7 +121,7 @@ local function abilityCollected()
     if abilities ~= newAbilities and checkEquippedEqualsObtained(newAbilities) then
         -- gui.text(50, 50, "Player obtained new ability") (doesn't display long enough)
         local item = (abilityMap[newAbilities - abilities] or "undefined")
-        console.log(comm.httpPost("http://localhost:5000/mzm/acquired", item))
+        comm.httpPost("http://localhost:5000/mzm/acquired", item)
         console.log("Player obtained " .. item .. ". (ability value is " .. string.format("%x, and difference is %x)", newAbilities, newAbilities - abilities))
     end
     abilities = newAbilities
@@ -130,7 +130,8 @@ end
 local function eTankCollected()
     local newCap = memory.readbyte(0x1530)
     if healthCap ~= newCap then
-        console.log("Player obtained a eTank. New total energy is " .. newCap .. ". (" .. ((newCap + 1) / 100) - 1 .. " energy tanks)")
+        comm.httpPost("http://localhost:5000/mzm/acquired/energy", healthCap)
+        console.log("Player obtained an eTank. New total energy is " .. newCap .. ". (" .. ((newCap + 1) / 100) - 1 .. " energy tanks)")
     end
     healthCap = newCap
 end
@@ -148,6 +149,7 @@ local function superMissileTankCollected()
     if superMissileCap ~= newCap then
         console.log("Player obtained a super missile tank. New capacity is " .. newCap .. ". (" .. (newCap / 2) .. " super missile tanks total)")
     end
+    superMissileCap = newCap
 end
 
 local function powerBombTankCollected()
@@ -155,6 +157,7 @@ local function powerBombTankCollected()
     if powerBombCap ~= newCap then
         console.log("Player obtained a power bomb tank. New capacity is " .. newCap .. ". (" .. (newCap / 2) .. " power bomb tanks total)")
     end
+    powerBombCap = newCap
 end
 
 local function onEveryFrame()
