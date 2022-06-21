@@ -413,7 +413,7 @@ async function checkAbilities()
       if (msg.data instanceof ArrayBuffer)
       {
         let newValue = Number(arrayBufferToHex(msg.data))
-        if (newValue != abilities)
+        if (abilityValueChanged(newValue))
         {
           console.log("Ability value changed. New ability value is 0x" + newValue.toString(16) + ", old value is 0x" + abilities.toString(16))
           cls!.post('/sm/abilities', {
@@ -439,7 +439,7 @@ async function checkBeams()
       if (msg.data instanceof ArrayBuffer)
       {
         let newBeams = Number(arrayBufferToHex(msg.data))
-        if (newBeams != beams)
+        if (beamValueChanged(newBeams))
         {
           console.log("New beam acquired. New beam values is " + newBeams.toString(16))
           cls!.post('/sm/beams', {
@@ -456,4 +456,24 @@ async function checkBeams()
     
     cls!.socket!.send(readAddressCommand("0xF509A6", 4))
   })
+}
+
+function abilityValueChanged(newValue: number): boolean
+{
+  // Ability value is formatted with the first two bytes being equipped
+  // and the second two bytes being collected.
+  // We don't care if the equipped changes.
+
+  let collected = abilities & 0x0000ffff
+  newValue &= 0x0000ffff
+
+  return newValue != collected
+
+}
+
+function beamValueChanged(newValue: number): boolean
+{
+  let collected = beams & 0x0000ffff
+  newValue &= 0x0000ffff
+  return newValue != collected
 }
