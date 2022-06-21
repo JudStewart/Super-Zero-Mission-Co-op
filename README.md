@@ -1,3 +1,3 @@
 # Super/Zero Mission Co-op
 
-A precursor to a larger project, using QUsb2Snes and BizHawk lua scripting, along with a backend python server, to share items between Super Metroid and Metroid: Zero Mission.
+Share items between Super Metroid and Metroid: Zero Mission. This is a precursor to a larger project. On the Super Metroid side, an angular site provides access to a TypeScript script that connects to a local websocket server run by QUsb2Snes. On the Zero Mission side, a lua script run through BizHawk handles all communication. The backend python server handles the communication between the two and updates the states that the games' respective handlers check.
