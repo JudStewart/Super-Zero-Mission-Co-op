@@ -180,6 +180,11 @@ let missilesCapacity = 0
 let supersCapacity = 0
 let powerBombsCapacity = 0
 
+let health = 99
+let missiles = 0
+let supers = 0
+let powerBombs = 0
+
 function readAddressCommand(address: string, size: number)
 {
   return JSON.stringify({
@@ -224,18 +229,31 @@ async function checkQUsb2Snes()
   if (settings['share_items'])
   {
     // console.log("Checking missile capacity...")
-    await checkMissiles()
+    await checkMissileCapacity()
     // console.log("Checking super missile capacity...")
-    await checkSupers()
+    await checkSupersCapacity()
     // console.log("Checking power bomb capacity...")
-    await checkPowerBombs()
+    await checkPowerBombsCapacity()
     // console.log("Checking energy capacity...")
-    await checkEnergy()
+    await checkEnergyCapacity()
     // console.log("Checking abilties...")
     await checkAbilities()
     // console.log("Checking beams...")
     await checkBeams()
   }
+  
+  if (settings['share_health'])
+  {
+    await checkHealth()
+  }
+
+  if (settings['share_ammo'])
+  {
+    await checkMissiles()
+    await checkSupers()
+    await checkPowerBombs()
+  }
+
   // Ensure status is applied
   // console.log("Updating status from server...")
   await ensureStatus()
@@ -246,54 +264,96 @@ async function checkQUsb2Snes()
 async function ensureStatus()
 {
   cls!.get('/sm/status').subscribe(async (res: any) => {
-    let energy = res['energy capacity']
-    if (energy != energyCapacity) 
+
+    if (settings['share_items'])
     {
-      console.log("Updating energy from " + energyCapacity + " to " + energy)
-      await write("0xF509C4", 2, energy)
-      energyCapacity = energy
+      let energy = res['energy capacity']
+      if (energy != energyCapacity) 
+      {
+        console.log("Updating energy from " + energyCapacity + " to " + energy)
+        await write("0xF509C4", 2, energy)
+        energyCapacity = energy
+      }
+      let missiles = res['missile capacity']
+      if (missiles != missilesCapacity) 
+      {
+        console.log("Updating missiles from " + missilesCapacity + " to " + missiles)
+        await write("0xF509C8", 2, missiles)
+        missilesCapacity = missiles
+      }
+      
+      let supers = res['supers capacity']
+      if (supers != supersCapacity) 
+      {
+        console.log("Updating supers from " + supersCapacity + " to " + supers)
+        await write("0xF509CC", 2, supers)
+        supersCapacity = supers
+      }
+      
+      let powerBombs = res['power bomb capacity']
+      if (powerBombs != powerBombsCapacity) 
+      {
+        console.log("Updating power bombs from " + powerBombsCapacity + " to " + powerBombs)
+        await write("0xF509D0", 2, powerBombs)
+        powerBombsCapacity = powerBombs
+      }
+      
+      let newAbilities = res['ability value']
+      // console.log("[DEBUG] ability value is 0x" + abilities.toString(16) + ". Server gave 0x" + newAbilities.toString(16) + ".")
+      if (abilityValueChanged(newAbilities)) 
+      {
+        newAbilities = checkAutoEquipAbilities(newAbilities)
+        console.log("Updating ability value from " + abilities + " to " + newAbilities)
+        await write("0xF509A2", 4, newAbilities, true)
+        abilities = newAbilities
+      }
+      
+      let newBeams = res['beam value']
+      if (beamValueChanged(newBeams)) 
+      {
+        newBeams = checkAutoEquipBeams(newBeams)
+        console.log("Updating beams value from " + beams + " to " + newBeams)
+        await write("0xF509A6", 4, newBeams, true)
+        beams = newBeams
+      }
     }
-    let missiles = res['missile capacity']
-    if (missiles != missilesCapacity) 
+
+    if (settings['share_health'])
     {
-      console.log("Updating missiles from " + missilesCapacity + " to " + missiles)
-      await write("0xF509C8", 2, missiles)
-      missilesCapacity = missiles
+      let newHealth = res['health']
+      if (health != newHealth)
+      {
+        console.log("Updating health from " + health + " to " + newHealth)
+        await write("0xF509C2", 2, newHealth)
+        health = newHealth
+      }
     }
-    
-    let supers = res['supers capacity']
-    if (supers != supersCapacity) 
+
+    if (settings['share_ammo'])
     {
-      console.log("Updating supers from " + supersCapacity + " to " + supers)
-      await write("0xF509CC", 2, supers)
-      supersCapacity = supers
-    }
-    
-    let powerBombs = res['power bomb capacity']
-    if (powerBombs != powerBombsCapacity) 
-    {
-      console.log("Updating power bombs from " + powerBombsCapacity + " to " + powerBombs)
-      await write("0xF509D0", 2, powerBombs)
-      powerBombsCapacity = powerBombs
-    }
-    
-    let newAbilities = res['ability value']
-    // console.log("[DEBUG] ability value is 0x" + abilities.toString(16) + ". Server gave 0x" + newAbilities.toString(16) + ".")
-    if (abilityValueChanged(newAbilities)) 
-    {
-      newAbilities = checkAutoEquipAbilities(newAbilities)
-      console.log("Updating ability value from " + abilities + " to " + newAbilities)
-      await write("0xF509A2", 4, newAbilities, true)
-      abilities = newAbilities
-    }
-    
-    let newBeams = res['beam value']
-    if (beamValueChanged(newBeams)) 
-    {
-      newBeams = checkAutoEquipBeams(newBeams)
-      console.log("Updating beams value from " + beams + " to " + newBeams)
-      await write("0xF509A6", 4, newBeams, true)
-      beams = newBeams
+      let newMissiles = res['missiles']
+      if (newMissiles != missiles)
+      {
+        console.log("Updating missile ammo from " + missiles + " to " + newMissiles)
+        await write("0xF509C6", 2, newMissiles)
+        missiles = newMissiles
+      }
+
+      let newSupers = res['supers']
+      if (newSupers != supers)
+      {
+        console.log("Updating supers ammo from " + supers + " to " + newSupers)
+        await write("0xF509CA", 2, newSupers)
+        supers = newSupers
+      }
+
+      let newPowerBombs = res['power bombs']
+      if (newPowerBombs != powerBombs)
+      {
+        console.log("Updating power bomb ammo from " + powerBombs + " to " + newPowerBombs)
+        await write("0xF509CE", 2, newPowerBombs)
+        powerBombs = newPowerBombs
+      }
     }
     
   })
@@ -346,7 +406,9 @@ function checkAutoEquipBeams(newBeams)
   return newBeams
 }
 
-async function checkMissiles() 
+// TODO consolidate the following functions that are exactly the same save for one changing word and address
+
+async function checkMissileCapacity() 
 {
   // Promise wrapper to allow awaiting function
   return new Promise(function(resolve, reject) {
@@ -379,7 +441,7 @@ async function checkMissiles()
   })
 }
 
-async function checkSupers()
+async function checkSupersCapacity()
 {
   return new Promise(function (resolve, reject) {
     cls!.socket!.onmessage = function (msg) {
@@ -405,7 +467,7 @@ async function checkSupers()
   })
 }
 
-async function checkPowerBombs()
+async function checkPowerBombsCapacity()
 {
   return new Promise(function (resolve, reject) {
     cls!.socket!.onmessage = function (msg) {
@@ -431,7 +493,7 @@ async function checkPowerBombs()
   })
 }
 
-async function checkEnergy()
+async function checkEnergyCapacity()
 {
   return new Promise(function (resolve, reject) {
     cls!.socket!.onmessage = function (msg) {
@@ -454,6 +516,110 @@ async function checkEnergy()
     }
     
     cls!.socket!.send(readAddressCommand("0xF509C4", 2))
+  })
+}
+
+async function checkHealth()
+{
+  return new Promise(function (resolve, reject) {
+    cls!.socket!.onmessage = function (msg) {
+      if (msg.data instanceof ArrayBuffer)
+      {
+        let newHealth = swap2Byte(Number(arrayBufferToHex(msg.data)))
+        if (newHealth != health)
+        {
+          console.log("Health changed. New health is " + newHealth)
+          cls!.post('/sm/health', {
+            "health": newHealth
+          }).subscribe((res: any) => {
+            console.log("Successfully posted new health to server. Response was " + JSON.stringify(res))
+          })
+          health = newHealth
+        }
+        resolve(newHealth)
+      }
+      reject("msg.data was not of type ArrayBuffer")
+    }
+
+    cls!.socket!.send(readAddressCommand("0xF509C2", 2))
+  })
+}
+
+async function checkMissiles()
+{
+  return new Promise(function (resolve, reject) {
+    cls!.socket!.onmessage = function (msg) {
+      if (msg.data instanceof ArrayBuffer)
+      {
+        let newMissiles = swap2Byte(Number(arrayBufferToHex(msg.data)))
+        if (newMissiles != missiles)
+        {
+          console.log("Missile ammo changed. New amount is " + newMissiles)
+          cls!.post('/sm/ammo/missiles', {
+            "missiles": newMissiles
+          }).subscribe((res: any) => {
+            console.log("Successfully posted new missile ammo. Response was " + JSON.stringify(res))
+          })
+          missiles = newMissiles
+        }
+        resolve(newMissiles)
+      }
+      reject("msg.data was not of type ArrayBuffer")
+    }
+
+    cls!.socket!.send(readAddressCommand("0xF509C6", 2))
+  })
+}
+
+async function checkSupers()
+{
+  return new Promise(function (resolve, reject) {
+    cls!.socket!.onmessage = function (msg) {
+      if (msg.data instanceof ArrayBuffer)
+      {
+        let newSupers = swap2Byte(Number(arrayBufferToHex(msg.data)))
+        if (newSupers != supers)
+        {
+          console.log("Supers ammo changed. New amount is " + newSupers)
+          cls!.post('/sm/ammo/supers', {
+            'supers': newSupers
+          }).subscribe((res: any) => {
+            console.log("Successfully posted new supers ammo. Res was " + JSON.stringify(res))
+          })
+          supers = newSupers
+        }
+        resolve(newSupers)
+      }
+      reject("msg.data was not of type ArrayBuffer")
+    }
+
+    cls!.socket!.send(readAddressCommand("0xF509CA", 2))
+  })
+}
+
+async function checkPowerBombs()
+{
+  return new Promise(function (resolve, reject) {
+    cls!.socket!.onmessage = function (msg) {
+      if (msg.data instanceof ArrayBuffer) 
+      {
+        let newPowerBombs = swap2Byte(Number(arrayBufferToHex(msg.data)))
+        if (newPowerBombs != powerBombs)
+        {
+          console.log("Power Bombs ammo changed. New amount is " + newPowerBombs)
+          cls!.post('/sm/ammo/powerbombs', {
+            "power bombs": newPowerBombs
+          }).subscribe((res: any) => {
+            console.log("Successfully posted new pbombs ammo. Res was " + JSON.stringify(res))
+          })
+          powerBombs = newPowerBombs
+        }
+        resolve(newPowerBombs)
+      }
+      reject("msg.data was not of type ArrayBuffer")
+    }
+
+    cls!.socket!.send(readAddressCommand("0xF509CE"))
   })
 }
 

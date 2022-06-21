@@ -115,6 +115,8 @@ def handle_options():
     resp.headers['Access-Control-Allow-Headers'] = 'content-type'
     return resp
 
+# -------------------------------------- Acquired --------------------------------------------
+
 @super_metroid.route('/acquired/missiles', methods = ['POST', 'OPTIONS'])
 def sm_missile_tank():
     if request.method == 'OPTIONS':
@@ -223,6 +225,28 @@ def sm_beams():
         "beams": beams
     })
     return resp
+
+
+# ------------------------------------------------------- Health --------------------------------------
+
+@super_metroid.route('/health', methods=['GET', 'POST', 'OPTIONS'])
+def sm_health():
+    pass
+
+# ----------------------------------------------------- Ammo ------------------------------------------
+
+@super_metroid.route('/ammo/missiles', methods=['GET', 'POST', 'OPTIONS'])
+def sm_missiles():
+    pass
+
+@super_metroid.route('/ammo/supers', methods=['GET', 'POST', 'OPTIONS'])
+def sm_supers():
+    pass
+
+@super_metroid.route('/ammo/powerbombs', methods=['GET', 'POST', 'OPTIONS'])
+def sm_power_bombs():
+    pass
+
     
 @super_metroid.route('/status', methods=['GET', 'OPTIONS'])
 def sm_status():
@@ -236,6 +260,10 @@ def sm_status():
         "supers capacity": (super_missile_tanks * 5),
         "power bomb capacity": (power_bomb_tanks * 5),
         "ability value": ability_value,
-        "beam value": beam_value
+        "beam value": beam_value,
+        "health": health,
+        "missiles": missiles,
+        "supers": supers,
+        "power bombs": power_bombs
     })
     return resp
