@@ -1,5 +1,9 @@
 # SmzmCoop
 
+An angular project used for the super metroid side. Essentially, connecting to this site on your computer runs the typescript code that connects QUsb2Snes to the python server which handles all of the actual data. This allows you to use QUsb2Snes as opposed to any specific emulator, and makes it easier than having to download a specific script for the game and run it.
+
+Below is the angular pre-generated readme.
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.6.
 
 ## Development server
