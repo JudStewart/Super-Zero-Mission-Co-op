@@ -290,6 +290,7 @@ async function ensureStatus()
     let newBeams = res['beam value']
     if (beamValueChanged(newBeams)) 
     {
+      newBeams = checkAutoEquipBeams(newBeams)
       console.log("Updating beams value from " + beams + " to " + newBeams)
       await write("0xF509A6", 4, newBeams, true)
       beams = newBeams
@@ -323,8 +324,26 @@ function checkAutoEquipAbilities(newAbilities)
 
 function checkAutoEquipBeams(newBeams)
 {
-  //This is going to need a different approach than the equivalent ability function
-  // because of the issues with things like the space time beam.
+  // In addition to what the equivalent ability function does, this will also turn off
+  // spazer if plasma is equipped
+  let equipped = (beams >> 16)
+  let collected = beams & 0x0000ffff
+
+  if (equipped != collected)
+  {
+    // If auto equip is off, plasma won't auto equip and spazer won't cause any issues
+    equipped = beams & 0xffff0000
+    newBeams &= 0x0000ffff
+    newBeams |= equipped
+  }
+  // 0x08000000 is the bit that will be on when plasma is equipped.
+  else if (newBeams & 0x08000000)
+  {
+    // if auto equip is on, we need to disable spazer if we have plasma equipped
+    // anding this will flip off 0x04000000, the bit that's on when spazer is equipped
+    newBeams &= (~0x04000000)
+  }
+  return newBeams
 }
 
 async function checkMissiles() 
