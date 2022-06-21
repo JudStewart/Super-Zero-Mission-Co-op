@@ -1,0 +1,22 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "~@angular/material/prebuilt-themes/purple-green.css";
+
+html, body { height: 100%; background-color: black; color: white;}
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+div {
+    margin: auto;
+    align-content: center;
+    text-align: center;
+}
+button {
+    width: 15%;
+    font-size: 16pt !important;
+    height: 48px !important;
+}
+mat-form-field {
+    width:25%;
+    color: white;
+    font-size: 16pt;
+}
+

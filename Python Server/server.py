@@ -1,101 +1,28 @@
-from flask import Flask, render_template, request
-from flask_socketio import SocketIO, emit, send
-import websocket
-import sys
-import json
-import ZeroMission
+from flask import Flask, Response
+from flask_socketio import SocketIO
+from werkzeug import serving
+from SuperMetroid import super_metroid
+from ZeroMission import zero_mission
+import Settings
 
-ws = websocket.WebSocket()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'my_secret_key'
-socketio = SocketIO(app, logger=True)
+app.register_blueprint(super_metroid)
+app.register_blueprint(zero_mission)
+socketio = SocketIO(app, logger=True, cors_allowed_origins="*")
+
+@app.route('/settings', methods = ['GET', 'OPTIONS'])
+def settings():
+    resp = Response(Settings.to_json())
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Headers'] = 'content-type'
+    return resp
 
 
-
-def connect_qusb2snes():
-    qusbIP = "ws://localhost:8080"
-    if (len(sys.argv) > 1): qusbIP = sys.argv[1]
-    try:
-        ws.connect(qusbIP)
-    except:
-        print("Invalid url: " + qusbIP)
-        exit()
-    ws.send(json.dumps({
-        "Opcode": "DeviceList",
-        "Space": "SNES"
-    }))
-    devList = json.loads(ws.recv())["Results"]
-    choice = -1
-    if (len(devList) == 1): choice = 0
-    elif (len(devList) == 0):
-        print("Please open QUsb2Snes and launch your preferred method of SNESing")
-        exit()
-    else:
-        for n, opt in enumerate(devList):
-            print(str(n) + ". " + opt)
-        while choice <= 0 or choice >= len(devList):
-            print("Choose a device:")
-            try:
-                choice = int(input)
-            except:
-                choice = -1
-                print("Please enter a valid number between 0 and " + str(len(devList) - 1))
-    device = devList[choice]
-    ws.send(json.dumps({
-        "Opcode": "Attach",
-        "Space": "SNES",
-        "Operands": [device]
-    }))
-    ws.send(json.dumps({
-        "Opcode": "Info",
-        "Space": "SNES"
-    }))
-    print(json.loads(ws.recv())["Results"])
-    
-@app.route('/mzm')
-def mzm():
-    return {
-        "value": "test"
-    }
-    
-@app.route('/mzm/acquired', methods= ['POST'])
-def mzm_received_item():
-    item = request.form['payload']
-    print(f"MZM player acquired item '{item}'")
-    return f"Parsing acquired {item}"
-    
-@app.route('/mzm/acquired/missile', methods = ['POST'])
-def mzm_missile_tank():
-    capacity = request.form['payload']
-    tanks = capacity / 5
-    print(f"MZM player acquired missile tank number {tanks}")
-    return "success"
-
-@app.route('/mzm/acquired/super', methods = ['POST'])
-def mzm_super_missile_tank():
-    capacity = request.form['payload']
-    tanks = capacity / 2
-    print(f"MZM player acquired super missile tank number {tanks}")
-    return "success"
-
-@app.route('/mzm/acquired/powerbomb', methods = ['POST'])
-def mzm_power_bomb_tank():
-    capacity = request.form['payload']
-    tanks = capacity / 2
-    print(f"MZM player acquired power bomb tank number {tanks}")
-    return "success"
-    
-@app.route('/mzm/acquired/energy', methods = ['POST'])
-def mzm_energy_tank():
-    capacity = request.form['payload']
-    tanks = ((capacity + 1) / 100) - 1
-    print(f"MZM player acquired e-tank number {tanks}")
-    ZeroMission.energy_tanks = tanks
-    return "success"
 
 @socketio.on('connect')
 def test_connect():
-    emit('confirmation',  {'result':'Connected'})
+    print('Connected')
     
 @socketio.on('disconnect')
 def disconnect():
@@ -105,6 +32,18 @@ def disconnect():
 def handle_message(message):
     print("Received message " + str(message))
 
+# https://stackoverflow.com/questions/56959585/skip-flask-logging-for-one-endpoint    
+def disable_endpoint_logs():
+    disabled_endpoints = ['/mzm/status', '/sm/status']
+    
+    parent_log_request = serving.WSGIRequestHandler.log_request
+    
+    def log_request(self, *args, **kwargs):
+        if self.path not in disabled_endpoints:
+            parent_log_request(self, *args, **kwargs)
+    
+    serving.WSGIRequestHandler.log_request = log_request
+
 if __name__ == "__main__":
-    # connect_qusb2snes()
+    disable_endpoint_logs()
     socketio.run(app)
