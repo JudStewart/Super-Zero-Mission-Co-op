@@ -61,26 +61,6 @@ export class HomeComponent implements OnInit {
   confirmed = false
 
   socket: WebSocket | undefined
-  
-  // res = ""
-  // testhttp() {
-  //   this.http.get(this.serverAddress + '/sm/test').subscribe((res: any) => {
-  //     this.res = JSON.stringify(res) // returns "{"status": "success"}"
-  //     console.log("res: " + this.res)
-  //   })
-  // }
-  
-  // debugTestReadAddress()
-  // {
-  //   this.socket!.onmessage = function (msg) {
-  //     if (msg.data instanceof ArrayBuffer)
-  //     {
-  //       console.log(arrayBufferToHex(msg.data)) //successfully shows the hex data
-  //     }
-  //   }
-    
-  //   this.socket!.send(readAddressCommand("0xF509A2", 4))
-  // }
 
   ngOnInit(): void {}
 
@@ -103,6 +83,8 @@ export class HomeComponent implements OnInit {
     console.log('Lost connection to QUsb2Snes; reloaded page');
   }
 
+  // Sends QUsb2Snes a request for the device list and populates the
+  // selector on the page.
   getDeviceList()
   { 
     if (this.socket) {
@@ -120,6 +102,8 @@ export class HomeComponent implements OnInit {
     }
   }
   
+  // Attaches to the selected device and asks QUsb2Snes for information,
+  // and subsequently displays it for confirmation
   selectDevice() 
   {
       if (!this.socket) return
@@ -146,20 +130,29 @@ export class HomeComponent implements OnInit {
       this.deviceSelected = false
   }
   
+  // Confirms the user's desired QUsb2Snes device, and begins the 
+  // commuinication with the python server. 
   confirmDevice()
   {
     this.confirmed = true
+    // Gets the settings from the server, partially to make sure the connection works, and partially
+    // to inform the decisions of some of the methods later on. Mostly it cuts out the need for
+    // running methods that aren't going to do anything based on disabled settings.
     this.http.get(this.serverAddress + "/settings").subscribe((res: any) => {
       settings = res
     })
+
+    // The core http loop; runs every second
     setInterval(checkQUsb2Snes, 1000)
   }
   
+  // wrapper for the http get function; allows it to be used outside of this class
   get(path: string)
   {
     return this.http.get(this.serverAddress + path)
   }
   
+  // wrapper for the http post function; as above
   post(path: string, body: any)
   {
     return this.http.post(this.serverAddress + path, body)
@@ -286,7 +279,7 @@ async function ensureStatus()
     
     let newAbilities = res['ability value']
     // console.log("[DEBUG] ability value is 0x" + abilities.toString(16) + ". Server gave 0x" + newAbilities.toString(16) + ".")
-    if (newAbilities != abilities) 
+    if (abilityValueChanged(newAbilities)) 
     {
       console.log("Updating ability value from " + abilities + " to " + newAbilities)
       await write("0xF509A2", 4, newAbilities, true)
@@ -294,7 +287,7 @@ async function ensureStatus()
     }
     
     let newBeams = res['beam value']
-    if (newBeams != beams) 
+    if (beamValueChanged(newBeams)) 
     {
       console.log("Updating beams value from " + beams + " to " + newBeams)
       await write("0xF509A6", 4, newBeams, true)
@@ -306,17 +299,24 @@ async function ensureStatus()
 
 async function checkMissiles() 
 {
+  // Promise wrapper to allow awaiting function
   return new Promise(function(resolve, reject) {
+    // Sets the socket on message to handle result of reading missile memory
     cls!.socket!.onmessage = function (msg) {
+      // Checks to make sure what was returned was memory values
       if (msg.data instanceof ArrayBuffer) {
+        // Converts the resulting data to hex, which is converted 
+        //  from a string to a number, which is then endian swapped
         let newCap = swap2Byte(Number(arrayBufferToHex(msg.data)))
         if (newCap != missilesCapacity) {
           console.log("Missile capacity changed. New capacity is " + newCap);
+          // Tell the server that our missile cap changed
           cls!.post('/sm/acquired/missiles', {
             "capacity": newCap
           }).subscribe((res: any) => {
             console.log("Successfully posted missiles to server. Response was " + JSON.stringify(res))
           })
+          // Update the missile cap
           missilesCapacity = newCap;
         }
         resolve(newCap)
@@ -324,6 +324,8 @@ async function checkMissiles()
       reject("msg.data was not of type ArrayBuffer")
     }
   
+    // Send the read command to QUsb2Snes
+    // This triggers the response that's handled above
     cls!.socket!.send(readAddressCommand("0xF509C8", 2))
   })
 }
