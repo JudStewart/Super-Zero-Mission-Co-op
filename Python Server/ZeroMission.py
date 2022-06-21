@@ -58,11 +58,22 @@ abilities = {
     "Ice": False,
     "Long": False,
 }
+
+# Share Items
+
 ability_value = 0
 missile_tanks = 0
 super_missile_tanks = 0
 power_bomb_tanks = 0
 energy_tanks = 0
+
+# Share Health
+health = 99
+
+# Share Ammo
+missiles = 0
+supers = 0
+power_bombs = 0
 
 def parse_ability_value(value = -1):
     if value == -1: value = ability_value
@@ -95,10 +106,14 @@ def update_ability_value():
 def status():
     return {
         "abilities": ability_value,
-        "missiles": missile_tanks * 5,
-        "supers": super_missile_tanks * 2,
-        "powerbombs": power_bomb_tanks * 2,
-        "energy": (energy_tanks * 100) + 99
+        "missile capacity": missile_tanks * 5,
+        "supers capacity": super_missile_tanks * 2,
+        "powerbombs capacity": power_bomb_tanks * 2,
+        "energy capacity": (senergy_tanks * 100) + 99,
+        "health": health,
+        "missiles": missiles,
+        "super missiles": supers,
+        "power bombs": power_bombs
     }
 
 # Flask Routes
@@ -120,6 +135,8 @@ def mzm_settings():
 @zero_mission.route('/status')
 def mzm_status():
     return " ".join(str(n) for n in status().values())
+
+# -------------------------- Acquired -------------------------------------------------------------
 
 @zero_mission.route('/acquired', methods = ['POST'])
 def mzm_received_item():
@@ -186,6 +203,32 @@ def mzm_energy_tank():
     print(f"MZM player acquired e-tank number {energy_tanks} (new capacity is {capacity})")
     return "success"
     
+
+# -------------------------------------------- Health ------------------------------------------
+
+@zero_mission.route('/health', methods = ['GET', 'POST'])
+def mzm_health():
+    # TODO
+    pass
+
+# ---------------------------------------------- Ammo -------------------------------------------
+
+@zero_mission.route('/ammo/missiles', methods = ['GET', 'POST'])
+def mzm_missiles():
+    # TODO
+    pass
+
+@zero_mission.route('/ammo/supers', methods = ['GET', 'POST'])
+def mzm_supers():
+    # TODO
+    pass
+
+@zero_mission.route('/ammo/powerbombs', methods = ['GET', 'POST'])
+def mzm_power_bombs():
+    # TODO
+    pass
+
+
 @zero_mission.route('/abilities')
 def mzm_abilities():
     return Response(json.dumps(abilities))
