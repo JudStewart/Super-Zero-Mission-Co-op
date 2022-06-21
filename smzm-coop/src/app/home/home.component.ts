@@ -281,6 +281,7 @@ async function ensureStatus()
     // console.log("[DEBUG] ability value is 0x" + abilities.toString(16) + ". Server gave 0x" + newAbilities.toString(16) + ".")
     if (abilityValueChanged(newAbilities)) 
     {
+      newAbilities = checkAutoEquipAbilities(newAbilities)
       console.log("Updating ability value from " + abilities + " to " + newAbilities)
       await write("0xF509A2", 4, newAbilities, true)
       abilities = newAbilities
@@ -295,6 +296,35 @@ async function ensureStatus()
     }
     
   })
+}
+
+function checkAutoEquipAbilities(newAbilities)
+{
+  // if the player has unequipped an ability, their equipped and collected values won't match.
+  // If this is the case, we may not want to automatically change what they have equipped.
+  let equipped = (abilities >> 16)
+  let collected = abilities & 0x0000ffff
+  // If the player has changed their equipped abilities
+  if (equipped != collected)
+  {
+    // Get the equipped abilities from the old value
+    equipped = abilities & 0xffff0000
+    // Get the collected abilities from the new value/dump the equipped value
+    newAbilities &= 0x0000ffff 
+    // Combine the two for new collected, old equipped
+    newAbilities |= equipped
+
+    //Theoretically we don't need to do any kind of checks here;
+    // you don't lose abilities in super metroid so you won't need to have something
+    // forced unequipped (like with the beams and spazer)
+  }
+  return newAbilities
+}
+
+function checkAutoEquipBeams(newBeams)
+{
+  //This is going to need a different approach than the equivalent ability function
+  // because of the issues with things like the space time beam.
 }
 
 async function checkMissiles() 
