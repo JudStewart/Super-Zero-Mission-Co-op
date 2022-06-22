@@ -48,12 +48,22 @@ beams = {
     "Spazer": False,
     "Plasma": False
 }
+
+# Share items
 ability_value = 0
 beam_value = 0
 missile_tanks = 0
 super_missile_tanks = 0
 power_bomb_tanks = 0
 energy_tanks = 0
+
+# share health
+health = 99
+
+# share ammo
+missiles = 0
+supers = 0
+power_bombs = 0
 
 # value will be a hex value formatted 0xAABBAABB
 # where AA and BB will be the same values both times
@@ -231,21 +241,73 @@ def sm_beams():
 
 @super_metroid.route('/health', methods=['GET', 'POST', 'OPTIONS'])
 def sm_health():
-    pass
+    if request.method == 'OPTIONS':
+        return handle_options()
+
+    if request.method == 'POST':
+        global health
+        health = request.json['health']
+        if settings['share_health']:
+            ZeroMission.health = health
+
+    resp = handle_options()
+    resp.data = json.dumps({
+        "health": health
+    })
+    return resp
 
 # ----------------------------------------------------- Ammo ------------------------------------------
 
 @super_metroid.route('/ammo/missiles', methods=['GET', 'POST', 'OPTIONS'])
 def sm_missiles():
-    pass
+    if request.method == 'OPTIONS':
+        return handle_options()
+
+    if request.method == 'POST':
+        global missiles
+        missiles = request.json['missiles']
+        if settings['share_ammo']:
+            ZeroMission.missiles = missiles
+    
+    resp = handle_options()
+    resp.data = json.dumps({
+        "missiles": missiles
+    })
+    return resp
 
 @super_metroid.route('/ammo/supers', methods=['GET', 'POST', 'OPTIONS'])
 def sm_supers():
-    pass
+    if request.method == 'OPTIONS':
+        return handle_options()
+    
+    if request.method == 'POST':
+        global supers
+        supers = request.json['supers']
+        if settings['share_ammo']:
+            ZeroMission.supers = supers
+    
+    resp = handle_options()
+    resp.data = json.dumps({
+        "supers": supers
+    })
+    return resp
 
 @super_metroid.route('/ammo/powerbombs', methods=['GET', 'POST', 'OPTIONS'])
 def sm_power_bombs():
-    pass
+    if request.method == 'OPTIONS':
+        return handle_options()
+    
+    if request.method == 'POST':
+        global power_bombs
+        power_bombs = request.json['power bombs']
+        if settings['share_ammo']:
+            ZeroMission.power_bombs = power_bombs
+    
+    resp = handle_options()
+    resp.data = json.dumps({
+        "power bombs": power_bombs
+    })
+    return resp
 
     
 @super_metroid.route('/status', methods=['GET', 'OPTIONS'])
