@@ -208,25 +208,39 @@ def mzm_energy_tank():
 
 @zero_mission.route('/health', methods = ['GET', 'POST'])
 def mzm_health():
-    # TODO
-    pass
+    global health
+    health = int(request.form['payload'])
+
+    if settings['share_health']:
+        SuperMetroid.health = health
+    
+    return "success"
 
 # ---------------------------------------------- Ammo -------------------------------------------
 
 @zero_mission.route('/ammo/missiles', methods = ['GET', 'POST'])
 def mzm_missiles():
-    # TODO
-    pass
+    global missiles
+    missiles = int(request.form['payload'])
+    if settings['share_ammo']:
+        SuperMetroid.missiles = missiles
+    return "success"
 
 @zero_mission.route('/ammo/supers', methods = ['GET', 'POST'])
 def mzm_supers():
-    # TODO
-    pass
+    global supers
+    supers = int(request.form['payload'])
+    if settings['share_ammo']:
+        SuperMetroid.supers = supers
+    return "success"
 
 @zero_mission.route('/ammo/powerbombs', methods = ['GET', 'POST'])
 def mzm_power_bombs():
-    # TODO
-    pass
+    global power_bombs
+    power_bombs = int(request.form['payload'])
+    if settings['share_ammo']:
+        SuperMetroid.power_bombs = power_bombs
+    return "success"
 
 
 @zero_mission.route('/abilities')
