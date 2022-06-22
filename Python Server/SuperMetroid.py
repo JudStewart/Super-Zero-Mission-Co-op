@@ -108,6 +108,32 @@ def update_beam_value():
             if not (beam == "Spazer" and beams.get("Plasma", False)):
                 beam_value |= mask
 
+def status():
+    return {
+        "energy capacity": (energy_tanks * 100) + 99,
+        "missile capacity": (missile_tanks * 5),
+        "supers capacity": (super_missile_tanks * 5),
+        "power bomb capacity": (power_bomb_tanks * 5),
+        "ability value": ability_value,
+        "beam value": beam_value,
+        "health": health,
+        "missiles": missiles,
+        "supers": supers,
+        "power bombs": power_bombs
+    }
+
+def apply_status(stats):
+    energy_tanks = (stats['energy capacity'] - 99) / 100
+    missile_tanks = stats['missile capacity'] / 5
+    super_missile_tanks = stats['supers capacity'] / 5
+    power_bomb_tanks = stats['power bomb capacity'] / 5
+    ability_value = stats['ability value']
+    beam_value = stats['beam value']
+    health = stats['health']
+    missiles = stats['missiles']
+    supers = stats['supers']
+    power_bombs = stats['power bombs']
+
 # Flask Routes
 
 
@@ -316,16 +342,5 @@ def sm_status():
         return handle_options()
         
     resp = handle_options()
-    resp.data = json.dumps({
-        "energy capacity": (energy_tanks * 100) + 99,
-        "missile capacity": (missile_tanks * 5),
-        "supers capacity": (super_missile_tanks * 5),
-        "power bomb capacity": (power_bomb_tanks * 5),
-        "ability value": ability_value,
-        "beam value": beam_value,
-        "health": health,
-        "missiles": missiles,
-        "supers": supers,
-        "power bombs": power_bombs
-    })
+    resp.data = json.dumps(status())
     return resp

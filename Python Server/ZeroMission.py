@@ -102,19 +102,30 @@ def update_ability_value():
     for mask, ability in ability_dict.items():
         if abilities.get(ability, False):
             ability_value |= mask
-            
+
 def status():
     return {
         "abilities": ability_value,
         "missile capacity": missile_tanks * 5,
         "supers capacity": super_missile_tanks * 2,
         "powerbombs capacity": power_bomb_tanks * 2,
-        "energy capacity": (senergy_tanks * 100) + 99,
+        "energy capacity": (energy_tanks * 100) + 99,
         "health": health,
         "missiles": missiles,
         "super missiles": supers,
         "power bombs": power_bombs
     }
+
+def apply_status(stats):
+    ability_value = stats['abilities']
+    missile_tanks = stats['missile capacity'] / 5
+    super_missile_tanks = stats['supers capacity'] / 2
+    power_bomb_tanks = stats['powerbombs capacity'] / 2
+    energy_tanks = (stats['energy capacity'] - 99) / 100
+    health = stats['health']
+    missiles = stats['missiles']
+    supers = stats['super missiles']
+    power_bombs = stats['power bombs']
 
 # Flask Routes
 
