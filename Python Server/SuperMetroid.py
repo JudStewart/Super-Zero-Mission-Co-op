@@ -136,13 +136,6 @@ def apply_status(stats):
 
 # Flask Routes
 
-
-# TODO: picking up charge beam in SM gives spazer?
-# TODO: picking up wave beam in SM gives plasma and then breaks the game
-# TODO: Handle beam logic; once you get plasma you can't disable spazer and 
-#       can't shoot anymore
-
-
 super_metroid = Blueprint('Super Metroid', __name__, url_prefix='/sm')
 
 def handle_options():

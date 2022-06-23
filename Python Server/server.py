@@ -49,7 +49,7 @@ def disconnect():
 def handle_message(message):
     print("Received message " + str(message))
 
-# https://stackoverflow.com/questions/56959585/skip-flask-logging-for-one-endpoint    
+# https://stackoverflow.com/questions/56959585/skip-flask-logging-for-one-endpoint - Thank you!
 def disable_endpoint_logs():
     disabled_endpoints = ['/mzm/status', '/sm/status']
     
