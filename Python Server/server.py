@@ -63,18 +63,23 @@ def disable_endpoint_logs():
 
 if __name__ == "__main__":
 
-    args, _ = getopt(sys.argv[1:], "l:s:h", ["load =", "save =", "help"])
+    args, _ = getopt(sys.argv[1:], "l:s:c:h", ["load =", "save =", "config =", "help"])
 
     for opt, arg in args:
         if opt in ["-l", "--load"]:
             Saves.load(arg)
         if opt in ['-s', '--save']:
             Saves.save_file_path = arg
-        if opt in ['-h', '--help']
+        if opt in ['-c', '--config', '--settings']:
+            Settings.settings = json.load(arg)
+            print("The following settings have been loaded: ")
+            print(json.dumps(Settings.settings, indent=4, sort_keys=True))
+        if opt in ['-h', '--help']:
             print("Options:")
-            print("\t-s, --save [file name]: specifies the file to save to")
-            print("\t-l, --load [file name]: loads a save from the provided file")
-            print("\t-h, --help: Show this list.")
+            print("\t-s / --save [file name]: specifies the file to save to.")
+            print("\t-l / --load [file name]: loads a save from the provided file.")
+            print("\t-c / --config [file name]: sets the settings of the run according to the provided json file.")
+            print("\t-h / --help: Show this list.")
             exit()
 
     disable_endpoint_logs()

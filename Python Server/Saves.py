@@ -1,15 +1,18 @@
 import ZeroMission
 import SuperMetroid
+import Settings
+import json
 
 save_file_path = "SMZM Save " + datetime.datetime.now() + ".json"
 
 def save_json():
     return {
-        "Super Metroid Status": SuperMetroid.status()
-        "Super Metroid Beams": SuperMetroid.beams
-        "Super Metroid Abilities": SuperMetroid.abilities
-        "Zero Mission Status": ZeroMission.status()
-        "Zero Mission Abilities": ZeroMission.abilities
+        "Super Metroid Status": SuperMetroid.status(),
+        "Super Metroid Beams": SuperMetroid.beams,
+        "Super Metroid Abilities": SuperMetroid.abilities,
+        "Zero Mission Status": ZeroMission.status(),
+        "Zero Mission Abilities": ZeroMission.abilities,
+        "Settings": Settings.to_json(),
     }
 
 def save():
@@ -25,4 +28,5 @@ def load(load_file):
     SuperMetroid.abilities = save['Super Metroid Abilities']
     ZeroMission.apply_status(save['Zero Mission Status'])
     ZeroMission.abilities = save['Zero Mission Abilities']
+    Settings.settings = json.loads(save['Settings'])
 
