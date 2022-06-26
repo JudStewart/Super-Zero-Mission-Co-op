@@ -5,9 +5,9 @@ from SuperMetroid import super_metroid
 from ZeroMission import zero_mission
 import Settings
 import Saves
-import datetime
 import sys
 import getopt
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'my_secret_key'
@@ -63,7 +63,7 @@ def disable_endpoint_logs():
 
 if __name__ == "__main__":
 
-    args, _ = getopt(sys.argv[1:], "l:s:c:h", ["load =", "save =", "config =", "help"])
+    args, _ = getopt.getopt(sys.argv[1:], "l:s:c:h", ["load =", "save =", "config =", "help"])
 
     for opt, arg in args:
         if opt in ["-l", "--load"]:

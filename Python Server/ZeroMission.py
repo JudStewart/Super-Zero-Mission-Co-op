@@ -117,6 +117,7 @@ def status():
     }
 
 def apply_status(stats):
+    #TODO: These need to be set to global
     ability_value = stats['abilities']
     missile_tanks = stats['missile capacity'] / 5
     super_missile_tanks = stats['supers capacity'] / 2

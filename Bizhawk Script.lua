@@ -40,23 +40,6 @@ local missiles = 0
 local supers = 0
 local powerBombs = 0
 
--- local function checkEquippedEqualsObtained(abilityValue)
---     -- if abilityValue is 0x12345678, this is 0x12
---     local eqAbility = bit.rshift(bit.band(abilityValue, 0xFF000000), 24)
---     -- and this is 0x34
---     local obAbility = bit.rshift(bit.band(abilityValue, 0x00FF0000), 16)
---     -- if they're the same, then the item has been obtained and equipped. If not, there's a cutscene playing and we'll ride that out
-
---     -- this is 0x78
---     local eqBeam = bit.band(abilityValue, 0x000000FF)
---     -- and this is 0x56.
---     local obBeam = bit.rshift(bit.band(abilityValue, 0x0000FF00), 8)
-
---     return (eqAbility == obAbility and eqBeam == obBeam)
--- end
-
---TODO: See if post request can go in background thread
-
 local function abilityCollected()
     local newAbilities = memory.read_u32_le(0x153C)
     if abilities ~= newAbilities then
@@ -79,9 +62,9 @@ local function missileTankCollected()
     local newCap = memory.read_u16_le(0x1532)
     if missileCap ~= newCap then
         comm.httpPost(comm.httpGetPostUrl() .. "/mzm/acquired/missiles", newCap)
-        console.log("Player obtained a missile tank. New capacity is " .. newCap .. ". (" .. (newCap / 5) .. " missile tanks total)")
+        console.log("Player obtained a missile tank. New capacity is " .. newCap .. ". (" .. (newCap / 5) .. " missile tanks total, old capacity was " .. missileCap .. ")")
+        missileCap = newCap
     end
-    missileCap = newCap
 end
 
 local function superMissileTankCollected()
@@ -89,8 +72,8 @@ local function superMissileTankCollected()
     if superMissileCap ~= newCap then
         comm.httpPost(comm.httpGetPostUrl() .. "/mzm/acquired/supers", newCap)
         console.log("Player obtained a super missile tank. New capacity is " .. newCap .. ". (" .. (newCap / 2) .. " super missile tanks total)")
+        superMissileCap = newCap
     end
-    superMissileCap = newCap
 end
 
 local function powerBombTankCollected()
@@ -98,8 +81,8 @@ local function powerBombTankCollected()
     if powerBombCap ~= newCap then
         comm.httpPost(comm.httpGetPostUrl() .. "/mzm/acquired/powerbombs", newCap)
         console.log("Player obtained a power bomb tank. New capacity is " .. newCap .. ". (" .. (newCap / 2) .. " power bomb tanks total)")
+        powerBombCap = newCap
     end
-    powerBombCap = newCap
 end
 
 local function checkHealth()
@@ -151,7 +134,7 @@ local function updateStatus()
         -- missiles
         local newMissilesCap = tonumber(status[2])
         if (newMissilesCap ~= missileCap) then
-            memory.write_u16_le(0x1532, missiles)
+            memory.write_u16_le(0x1532, newMissilesCap)
             missileCap = newMissilesCap
         end
         -- supers

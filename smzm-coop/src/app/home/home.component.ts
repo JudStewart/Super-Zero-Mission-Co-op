@@ -359,7 +359,7 @@ async function ensureStatus()
   })
 }
 
-function checkAutoEquipAbilities(newAbilities)
+function checkAutoEquipAbilities(newAbilities: number)
 {
   // if the player has unequipped an ability, their equipped and collected values won't match.
   // If this is the case, we may not want to automatically change what they have equipped.
@@ -382,7 +382,7 @@ function checkAutoEquipAbilities(newAbilities)
   return newAbilities
 }
 
-function checkAutoEquipBeams(newBeams)
+function checkAutoEquipBeams(newBeams: number)
 {
   // In addition to what the equivalent ability function does, this will also turn off
   // spazer if plasma is equipped
@@ -619,7 +619,7 @@ async function checkPowerBombs()
       reject("msg.data was not of type ArrayBuffer")
     }
 
-    cls!.socket!.send(readAddressCommand("0xF509CE"))
+    cls!.socket!.send(readAddressCommand("0xF509CE", 2))
   })
 }
 

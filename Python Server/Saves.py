@@ -2,8 +2,9 @@ import ZeroMission
 import SuperMetroid
 import Settings
 import json
+import datetime
 
-save_file_path = "SMZM Save " + datetime.datetime.now() + ".json"
+save_file_path = "SMZM Save " + str(datetime.datetime.now()) + ".json"
 
 def save_json():
     return {

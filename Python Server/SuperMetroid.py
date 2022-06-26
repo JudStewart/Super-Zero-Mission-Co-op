@@ -3,6 +3,10 @@ from Settings import settings
 import ZeroMission
 import json
 
+# TODO:
+#   for some reason when you pick up charge beam in SM, you gain spazer.
+
+
 # Game Info
 
 ability_dict = {
@@ -105,8 +109,7 @@ def update_beam_value():
     global beam_value
     for mask, beam in beam_dict.items():
         if beams.get(beam, False):
-            if not (beam == "Spazer" and beams.get("Plasma", False)):
-                beam_value |= mask
+            beam_value |= mask
 
 def status():
     return {
@@ -123,6 +126,7 @@ def status():
     }
 
 def apply_status(stats):
+    #TODO: These need to be marked global
     energy_tanks = (stats['energy capacity'] - 99) / 100
     missile_tanks = stats['missile capacity'] / 5
     super_missile_tanks = stats['supers capacity'] / 5
