@@ -312,7 +312,7 @@ async function ensureStatus()
       if (beamValueChanged(newBeams)) 
       {
         newBeams = checkAutoEquipBeams(newBeams)
-        console.log("Updating beams value from " + beams + " to " + newBeams)
+        console.log("Updating beams value from " + beams.toString(16) + " to " + newBeams)
         await write("0xF509A6", 4, newBeams, true)
         beams = newBeams
       }

@@ -3,10 +3,6 @@ from Settings import settings
 import ZeroMission
 import json
 
-# TODO:
-#   for some reason when you pick up charge beam in SM, you gain spazer.
-
-
 # Game Info
 
 ability_dict = {
@@ -79,8 +75,10 @@ def parse_abilities(value = -1):
     update_ability_value()
 
 def parse_beams(value = -1):
-    if value == -1: value = ability_value
+    if value == -1: value = beam_value
+    print(f"[DEBUG] - - Parsing beams with value of {hex(value)}")
     for mask, beam in beam_dict.items():
+        print(f"[DEBUG] - - For mask {hex(mask)} and beam {beam}, bool is {bool(value & mask)} (value is {hex(value & mask)})")
         beams[beam] = bool(value & mask) 
     update_beam_value()
 
