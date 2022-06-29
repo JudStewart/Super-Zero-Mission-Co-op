@@ -1,7 +1,8 @@
 from flask import Blueprint, request, Response
 from Settings import settings
-import ZeroMission
 import json
+import ZeroMission
+import Saves
 
 # Game Info
 
@@ -124,17 +125,29 @@ def status():
     }
 
 def apply_status(stats):
-    #TODO: These need to be marked global
+    global energy_tanks
     energy_tanks = (stats['energy capacity'] - 99) / 100
+    global missile_tanks
     missile_tanks = stats['missile capacity'] / 5
+    global super_missile_tanks
     super_missile_tanks = stats['supers capacity'] / 5
+    global power_bomb_tanks
     power_bomb_tanks = stats['power bomb capacity'] / 5
+    global ability_value
     ability_value = stats['ability value']
+    global beam_value
     beam_value = stats['beam value']
+    global health
     health = stats['health']
+    global missiles
     missiles = stats['missiles']
+    global supers
     supers = stats['supers']
+    global power_bombs
     power_bombs = stats['power bombs']
+
+def sm_save():
+    Saves.save()
 
 # Flask Routes
 
@@ -161,6 +174,8 @@ def sm_missile_tank():
     if settings['share_items']:
         ZeroMission.missile_tanks = missile_tanks
     
+    sm_save()
+
     resp = handle_options()
     resp.data = json.dumps({"capacity" : capacity})
     return resp
@@ -177,6 +192,8 @@ def sm_super_tank():
     
     if settings['share_items']:
         ZeroMission.super_missile_tanks = super_missile_tanks
+    
+    sm_save()
     
     resp = handle_options()
     resp.data = json.dumps({"capacity": capacity})
@@ -195,6 +212,8 @@ def sm_power_bomb():
     if settings['share_items']:
         ZeroMission.power_bomb_tanks = power_bomb_tanks
     
+    sm_save()
+    
     resp = handle_options()
     resp.data = json.dumps({"capacity": capacity})
     return resp
@@ -211,6 +230,8 @@ def sm_energy_tank():
     
     if settings['share_items']:
         ZeroMission.energy_tanks = energy_tanks
+    
+    sm_save()
     
     resp = handle_options()
     resp.data = json.dumps({"capacity": capacity})
@@ -230,6 +251,7 @@ def sm_abilities():
         if settings['share_items']:
             ZeroMission.parse_super_metroid_abilities(abilities)
     
+    sm_save()
     
     resp = handle_options()
     resp.data = json.dumps({
@@ -248,8 +270,10 @@ def sm_beams():
         parse_beams()
         print("SM Beam value changed. New beam list is " + json.dumps(beams, indent=4))
         
-    if settings['share_items']:
-        ZeroMission.parse_super_metroid_beams(beams)
+        if settings['share_items']:
+            ZeroMission.parse_super_metroid_beams(beams)
+    
+    sm_save()
     
     resp = handle_options()
     resp.data = json.dumps({
@@ -270,6 +294,8 @@ def sm_health():
         health = request.json['health']
         if settings['share_health']:
             ZeroMission.health = health
+    
+    sm_save()
 
     resp = handle_options()
     resp.data = json.dumps({
@@ -290,6 +316,8 @@ def sm_missiles():
         if settings['share_ammo']:
             ZeroMission.missiles = missiles
     
+    sm_save()
+    
     resp = handle_options()
     resp.data = json.dumps({
         "missiles": missiles
@@ -307,6 +335,8 @@ def sm_supers():
         if settings['share_ammo']:
             ZeroMission.supers = supers
     
+    sm_save()
+    
     resp = handle_options()
     resp.data = json.dumps({
         "supers": supers
@@ -323,6 +353,8 @@ def sm_power_bombs():
         power_bombs = request.json['power bombs']
         if settings['share_ammo']:
             ZeroMission.power_bombs = power_bombs
+    
+    sm_save()
     
     resp = handle_options()
     resp.data = json.dumps({
