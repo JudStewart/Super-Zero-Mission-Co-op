@@ -382,6 +382,8 @@ function checkAutoEquipAbilities(newAbilities: number)
   return newAbilities
 }
 
+//TODO: Make the following function not care about spazer
+
 function checkAutoEquipBeams(newBeams: number)
 {
   // In addition to what the equivalent ability function does, this will also turn off

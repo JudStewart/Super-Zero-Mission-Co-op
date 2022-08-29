@@ -71,7 +71,9 @@ if __name__ == "__main__":
         if opt in ['-s', '--save']:
             Saves.save_file_path = arg
         if opt in ['-c', '--config', '--settings']:
-            Settings.settings = json.load(arg)
+            settings_file = open(arg)
+            Settings.settings = json.load(settings_file)
+            settings_file.close()
             print("The following settings have been loaded: ")
             print(json.dumps(Settings.settings, indent=4, sort_keys=True))
         if opt in ['-h', '--help']:
@@ -83,4 +85,4 @@ if __name__ == "__main__":
             exit()
 
     disable_endpoint_logs()
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0', port=5000)

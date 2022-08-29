@@ -1,0 +1,6 @@
+{
+    "share_health": true,
+    "share_ammo": true,
+    "share_items": true,
+    "swap_items": true
+}
