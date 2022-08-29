@@ -117,16 +117,27 @@ def status():
     }
 
 def apply_status(stats):
-    #TODO: These need to be set to global
+    global ability_value
     ability_value = stats['abilities']
+    global missile_tanks
     missile_tanks = stats['missile capacity'] / 5
+    global super_missile_tanks
     super_missile_tanks = stats['supers capacity'] / 2
+    global power_bomb_tanks
     power_bomb_tanks = stats['powerbombs capacity'] / 2
+    global energy_tanks
     energy_tanks = (stats['energy capacity'] - 99) / 100
+    global health
     health = stats['health']
+    global missiles
     missiles = stats['missiles']
+    global supers
     supers = stats['super missiles']
+    global power_bombs
     power_bombs = stats['power bombs']
+
+def zm_save():
+    Saves.save()
 
 # Flask Routes
 
@@ -164,6 +175,7 @@ def mzm_received_item():
         SuperMetroid.parse_zero_mission_abilities(abilities)
     
     print(f"MZM player acquired item '{new_item}'")
+    zm_save()
     return str(ability_value)
 
 @zero_mission.route('/acquired/missiles', methods = ['POST'])
@@ -177,6 +189,7 @@ def mzm_missile_tank():
         SuperMetroid.missile_tanks = missile_tanks
     
     print(f"MZM player acquired missile tank number {missile_tanks}")
+    zm_save()
     return "success"
 
 @zero_mission.route('/acquired/supers', methods = ['POST'])
@@ -189,6 +202,7 @@ def mzm_super_missile_tank():
         SuperMetroid.super_missile_tanks = super_missile_tanks
     
     print(f"MZM player acquired super missile tank number {super_missile_tanks}")
+    zm_save()
     return "success"
 
 @zero_mission.route('/acquired/powerbombs', methods = ['POST'])
@@ -201,6 +215,7 @@ def mzm_power_bomb_tank():
         SuperMetroid.power_bomb_tanks = power_bomb_tanks
         
     print(f"MZM player acquired power bomb tank number {power_bomb_tanks}")
+    zm_save()
     return "success"
     
 @zero_mission.route('/acquired/energy', methods = ['POST'])
@@ -213,6 +228,7 @@ def mzm_energy_tank():
         SuperMetroid.energy_tanks = energy_tanks
     
     print(f"MZM player acquired e-tank number {energy_tanks} (new capacity is {capacity})")
+    zm_save()
     return "success"
     
 
@@ -226,6 +242,7 @@ def mzm_health():
     if settings['share_health']:
         SuperMetroid.health = health
     
+    zm_save()
     return "success"
 
 # ---------------------------------------------- Ammo -------------------------------------------
@@ -236,6 +253,7 @@ def mzm_missiles():
     missiles = int(request.form['payload'])
     if settings['share_ammo']:
         SuperMetroid.missiles = missiles
+    zm_save()
     return "success"
 
 @zero_mission.route('/ammo/supers', methods = ['GET', 'POST'])
@@ -244,6 +262,7 @@ def mzm_supers():
     supers = int(request.form['payload'])
     if settings['share_ammo']:
         SuperMetroid.supers = supers
+    zm_save()
     return "success"
 
 @zero_mission.route('/ammo/powerbombs', methods = ['GET', 'POST'])
@@ -252,6 +271,7 @@ def mzm_power_bombs():
     power_bombs = int(request.form['payload'])
     if settings['share_ammo']:
         SuperMetroid.power_bombs = power_bombs
+    zm_save()
     return "success"
 
 

@@ -186,6 +186,21 @@ local function updateStatus()
     end
 end
 
+-- This runs a little too slowly on a non-local machine.
+-- Here's some brainstorming to fix that:
+    -- Instead of going through each function on each frame,
+    -- create a table of coroutines that do each function.
+    -- So table[1] does abilityCollected(), table[2] does eTankCollected(), etc.
+    -- And this can be based on the settings as well; if something doesn't need to
+    -- be done as per the settings, then just don't add it to the table.
+    -- make a count variable, and every frame add one to it and then mod it by the
+    -- table length. This will cause it to loop over the table's indices every frame.
+    -- On each frame, execute whatever coroutine is present in the table at that index.
+    -- Instead of having to do them all each frame, it goes through and does one per frame
+    -- changing every time. This may mean that you execute checkHealth 5 frames later than
+    -- you would have otherwise, but that's only 1/6th of a second. And instead of having to do
+    -- up to 8 reads/writes/gets/posts per frame, it would only do one.
+
 local function onEveryFrame()
     if shareItems then
         abilityCollected()
