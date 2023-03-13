@@ -109,5 +109,8 @@
       }
     }
   },
-  "defaultProject": "smzm-coop"
+  "defaultProject": "smzm-coop",
+  "cli": {
+    "analytics": false
+  }
 }

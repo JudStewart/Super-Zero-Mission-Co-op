@@ -1,45 +1,8 @@
-<div>    
-    <h1>Super Metroid QUsb2Snes Connecter</h1>
-    <br><br>
-    <div class="form-field">
-        <mat-form-field appearance="fill" color="accent">
-            <mat-label>Server Address</mat-label>
-            <input matInput [(ngModel)]="serverAddress" [disabled]="connected" placeholder="http://localhost:5000">
-        </mat-form-field>
-    </div>
-    <br>
-    <div class="form-field">
-        <mat-form-field appearance="fill" color="accent">
-            <mat-label>QUsb2Snes Address</mat-label>
-            <input matInput [(ngModel)]="qusbAddress" [disabled]="connected" placeholder="ws://localhost:8080">
-        </mat-form-field>
-    </div>
-    <br>
-    <button mat-raised-button color="accent" [disabled]="connected" (click)="connect()" *ngIf="!connected">Connect</button>
-    
-    <!---------------------------------------------------------------------------------------------------->
-    
-    <h2 *ngIf="connected && !confirmed">Connected!</h2>
-    
-    <button mat-raised-button color="accent" *ngIf="connected && deviceList.length == 0" (click)="getDeviceList()">Get Device List</button>
-    
-    <mat-form-field appearance="fill" color="accent" *ngIf="!deviceSelected && deviceList.length != 0">
-        <mat-label>Device</mat-label>
-        <mat-select [(ngModel)]="device" name="device-select">
-            <mat-option *ngFor="let dev of deviceList" [value] = "dev">
-                {{dev}}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
-    <br><br>
-    <button mat-raised-button color="accent" *ngIf="!deviceSelected && deviceList.length != 0" (click)="selectDevice()" [disabled]="device == ''">Select Device</button>
-    
-    <h2 *ngIf="deviceSelected && !confirmed">Is this correct?</h2>
-    <h2 *ngIf="confirmed">Connected to:</h2>
-    <br>
-    <p *ngIf="deviceSelected">{{info}}</p>
-    <br><br>
-    <button mat-raised-button class="padded" color="accent" *ngIf="deviceSelected && !confirmed" (click)="confirmDevice()">Yes</button>
-    <button mat-raised-button class="padded" *ngIf="deviceSelected && !confirmed" (click)="incorrectDevice()">No</button>
-    
+<div style="text-align: center;">
+<h1> Placeholder home screen! Yay! </h1>
+
+<ul>
+    <li><a routerLink="/SuperMetroid" routerLinkActive="true">Super Metroid</a></li>
+    <li><a routerLink="/ZeroMission" routerLinkActive="true">Zero Mission</a></li>
+</ul>
 </div>

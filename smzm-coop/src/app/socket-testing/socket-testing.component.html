@@ -1,0 +1,9 @@
+<h1>Debug Testing for websocket server</h1>
+<textarea [(ngModel)]="content" name="contentInput" cols="40" rows="5"></textarea>
+<br><button (click)="sendMessage()">Send Message</button>
+<br><br>
+<h2>Messages</h2>
+<br>
+<ul>
+    <li *ngFor="let msg of messages"><strong>{{msg.from}}</strong> at <i>{{msg.date}}</i>: {{msg.content}} (sent to {{msg.to}})</li>
+</ul>

@@ -15,11 +15,17 @@ import {MatSelectModule} from '@angular/material/select';
 import {HttpClientModule} from '@angular/common/http'
 
 import { HomeComponent } from './home/home.component';
+import { SuperMetroidComponent } from './super-metroid/super-metroid.component';
+import { ZeroMissionComponent } from './zero-mission/zero-mission.component';
+import { SocketTestingComponent } from './socket-testing/socket-testing.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
+    SuperMetroidComponent,
+    ZeroMissionComponent,
+    SocketTestingComponent
   ],
   imports: [
     BrowserModule,
